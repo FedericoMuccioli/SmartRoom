@@ -5,7 +5,7 @@
 #include "devices/Led.h"
 #include "devices/ServoMotorImpl.h"
 
-#define SMART_LIGHTING_PERIOD 1000
+#define SMART_LIGHTING_PERIOD 100
 
 class SmartLightingTask: public Task {
 
