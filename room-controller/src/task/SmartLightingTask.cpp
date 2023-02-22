@@ -22,9 +22,27 @@ void SmartLightingTask::init(int period){
 void SmartLightingTask::tick(){
   switch (state){
     case OFF:
-      led->switchLight();
-      motor->setPosition(random(0,180));
-
+      //led->switchLight();
+      //motor->setPosition(random(0,180));
+      if(MsgService.isMsgAvailable()){
+          Msg *msg = MsgService.receiveMsg();
+          String string = msg->getContent();
+          delete msg;
+          char code = string.charAt(0);
+          int value = string.substring(1).toInt();
+          switch(code){
+          case 'l':
+            if(value){
+              led->switchOn();
+            } else{
+              led->switchOff();
+            }
+            break;
+          case 'd':
+            motor->setPosition(value);
+            break;
+          }
+      }
       break;
     /*
       if (smartLighting->isSomeoneDetected()){
