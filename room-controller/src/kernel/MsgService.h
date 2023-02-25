@@ -2,6 +2,7 @@
 #define __MSGSERVICE__
 
 #include <Arduino.h>
+#include "SoftwareSerial.h"
 
 class Msg {
   String content;
@@ -16,12 +17,7 @@ public:
   }
 };
 
-class Pattern {
-public:
-  virtual boolean match(const Msg& m) = 0;  
-};
-
-class MsgServiceClass {
+class MsgServiceSerial {
     
 public: 
   
@@ -32,13 +28,26 @@ public:
 
   bool isMsgAvailable();
   Msg* receiveMsg();
-
-  bool isMsgAvailable(Pattern& pattern);
-  Msg* receiveMsg(Pattern& pattern);
   
   void sendMsg(const String& msg);
 };
 
-extern MsgServiceClass MsgService;
+class MsgServiceBT {
+    
+public: 
+  MsgServiceBT(int rxPin, int txPin);  
+  void init(int bound);  
+  bool isMsgAvailable();
+  Msg* receiveMsg();
+  bool sendMsg(Msg msg);
+
+private:
+  String content;
+  Msg* availableMsg;
+  SoftwareSerial* channel;
+  
+};
+
+extern MsgServiceSerial MsgSerial;
 
 #endif

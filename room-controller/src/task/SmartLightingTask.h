@@ -4,6 +4,7 @@
 #include "kernel/Task.h"
 #include "devices/Led.h"
 #include "devices/ServoMotorImpl.h"
+#include "kernel/MsgService.h"
 
 #define SMART_LIGHTING_PERIOD 100
 
@@ -13,10 +14,11 @@ private:
   enum {OFF, ON, DISABLE} state;
   Light* led;
   ServoMotor* motor;
+  MsgServiceBT* msgBT;
 
 public:
-  SmartLightingTask();  
-  void init(int period);  
+  SmartLightingTask(MsgServiceBT* msgBT);  
+  void init(int period);
   void tick();
 };
 

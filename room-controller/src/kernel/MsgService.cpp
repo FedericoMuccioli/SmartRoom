@@ -3,13 +3,13 @@
 
 String content;
 
-MsgServiceClass MsgService;
+MsgServiceSerial MsgSerial;
 
-bool MsgServiceClass::isMsgAvailable(){
+bool MsgServiceSerial::isMsgAvailable(){
   return msgAvailable;
 }
 
-Msg* MsgServiceClass::receiveMsg(){
+Msg* MsgServiceSerial::receiveMsg(){
   if (msgAvailable){
     Msg* msg = currentMsg;
     msgAvailable = false;
@@ -21,7 +21,7 @@ Msg* MsgServiceClass::receiveMsg(){
   }
 }
 
-void MsgServiceClass::init(int bound){
+void MsgServiceSerial::init(int bound){
   Serial.begin(bound);
   content.reserve(256);
   content = "";
@@ -29,8 +29,46 @@ void MsgServiceClass::init(int bound){
   msgAvailable = false;  
 }
 
-void MsgServiceClass::sendMsg(const String& msg){
+void MsgServiceSerial::sendMsg(const String& msg){
   Serial.println(msg);
+}
+
+MsgServiceBT::MsgServiceBT(int rxPin, int txPin){
+  channel = new SoftwareSerial(rxPin, txPin);
+}
+
+void MsgServiceBT::init(int bound){
+  content.reserve(256);
+  channel->begin(9600);
+  availableMsg = NULL;
+}
+
+bool MsgServiceBT::sendMsg(Msg msg){
+  channel->println(msg.getContent());  
+}
+
+bool MsgServiceBT::isMsgAvailable(){
+  while (channel->available()) {
+    char ch = (char) channel->read();
+    if (ch == '\n'){
+      availableMsg = new Msg(content); 
+      content = "";
+      return true;    
+    } else {
+      content += ch;      
+    }
+  }
+  return false;  
+}
+
+Msg* MsgServiceBT::receiveMsg(){
+  if (availableMsg != NULL){
+    Msg* msg = availableMsg;
+    availableMsg = NULL;
+    return msg;  
+  } else {
+    return NULL;
+  }
 }
 
 void serialEvent() {
@@ -38,8 +76,8 @@ void serialEvent() {
   while (Serial.available()) {
     char ch = (char) Serial.read();
     if (ch == '\n'){
-      MsgService.currentMsg = new Msg(content);
-      MsgService.msgAvailable = true;      
+      MsgSerial.currentMsg = new Msg(content);
+      MsgSerial.msgAvailable = true;      
     } else {
       content += ch;      
     }
@@ -47,19 +85,3 @@ void serialEvent() {
   
 }
 
-bool MsgServiceClass::isMsgAvailable(Pattern& pattern){
-  return (msgAvailable && pattern.match(*currentMsg));
-}
-
-Msg* MsgServiceClass::receiveMsg(Pattern& pattern){
-  if (msgAvailable && pattern.match(*currentMsg)){
-    Msg* msg = currentMsg;
-    msgAvailable = false;
-    currentMsg = NULL;
-    content = "";
-    return msg;  
-  } else {
-    return NULL; 
-  }
-  
-}
