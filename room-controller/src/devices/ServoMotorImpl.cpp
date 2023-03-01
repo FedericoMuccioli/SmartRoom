@@ -17,10 +17,6 @@ void ServoMotorImpl::off(){
 void ServoMotorImpl::setPosition(int angle){
   float coeff = (2250.0-750.0)/180;
   this->angle = angle < 0 ? 0 : angle > 180 ? 180 : angle;
-  /*debug
-  Serial.print("angle: ");
-  Serial.println(this->angle);
-  */
   motor.write(750 + this->angle*coeff);              
 }
 

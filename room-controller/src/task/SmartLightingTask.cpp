@@ -15,7 +15,7 @@ void SmartLightingTask::init(int period){
   led->switchOff();
   motor->on();
   motor->setPosition(0);
-  state = OFF;
+  state = ON;
   //MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
 }
   
@@ -25,46 +25,42 @@ void SmartLightingTask::tick(){
       //led->switchLight();
       //motor->setPosition(random(0,180));
       if(msgBT->isMsgAvailable()){
-          Msg *msg = msgBT->receiveMsg();
-          String string = msg->getContent();
-          delete msg;
-          char code = string.charAt(0);
-          int value = string.substring(1).toInt();
-          switch(code){
-          case 'l':
-            if(value){
-              led->switchOn();
-            } else{
-              led->switchOff();
-            }
-            break;
-          case 'd':
-            motor->setPosition(value);
-            break;
+        Msg *msg = msgBT->receiveMsg();
+        String string = msg->getContent();
+        delete msg;
+        char code = string.charAt(0);
+        int value = string.substring(1).toInt();
+        switch(code){
+        case 'l':
+          if(value == 2){
+            led->switchLight();
           }
+          break;
+        case 'd':
+          motor->setPosition(map(value, 0, 100, 0, 180));
+          break;
+        }
       }
       break;
     case OFF:
-      //led->switchLight();
-      //motor->setPosition(random(0,180));
       if(MsgSerial.isMsgAvailable()){
-          Msg *msg = MsgSerial.receiveMsg();
-          String string = msg->getContent();
-          delete msg;
-          char code = string.charAt(0);
-          int value = string.substring(1).toInt();
-          switch(code){
-          case 'l':
-            if(value){
-              led->switchOn();
-            } else{
-              led->switchOff();
-            }
-            break;
-          case 'd':
-            motor->setPosition(value);
-            break;
+        Msg *msg = MsgSerial.receiveMsg();
+        String string = msg->getContent();
+        delete msg;
+        char code = string.charAt(0);
+        int value = string.substring(1).toInt();
+        switch(code){
+        case 'l':
+          if(value){
+            led->switchOn();
+          } else{
+            led->switchOff();
           }
+          break;
+        case 'd':
+          motor->setPosition(value);
+          break;
+        }
       }
       break;
     /*
