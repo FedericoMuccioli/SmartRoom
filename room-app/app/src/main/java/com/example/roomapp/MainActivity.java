@@ -32,13 +32,14 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String CONNECTED_DEVICE = "CONNECTED_DEVICE";
     private static final String BLUETOOTH_NO_SUPPORT_MSG = "Bluetooth not supported!";
     private static final String BLUETOOTH_ENABLE_MSG = "Enable bluetooth to use app!";
     private static final String BLUETOOTH_PERMISSION_MSG = "Allow permission to use app!";
     private static final String UNKNOWN_RESULT_MSG = "Unknown result";
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_ENABLE_BT_1 = 2;
-    private static final int REQUEST_ENABLE_BT_2= 3;
+    private static final int REQUEST_ENABLE_BT_2 = 3;
     private static final int REQUEST_SCAN_BT = 4;
 
     private ListView pairedListView;
@@ -61,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,18 +79,25 @@ public class MainActivity extends AppCompatActivity {
         pairedListName = new ArrayList<>();
         pairedListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, pairedListName);
         pairedListView.setAdapter(pairedListAdapter);
+        pairedListView.setOnItemClickListener((adapterView, view, i, l) -> {
+            clickedDevice(pairedList.get(i));
+        });
         unknownList = new ArrayList<>();
         unknownListName = new ArrayList<>();
         unknownListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, unknownListName);
         unknownListView.setAdapter(unknownListAdapter);
         unknownListView.setOnItemClickListener((adapterView, view, i, l) -> {
-            onDeviceClicked(unknownList.get(i));
+            clickedDevice(unknownList.get(i));
         });
 
         checkSupportedBluetooth();
         scanBluetooth();
+    }
 
-
+    private void clickedDevice(final BluetoothDevice device) {
+        Intent intent = new Intent(this, RoomActivity.class);
+        intent.putExtra(CONNECTED_DEVICE, device);
+        startActivity(intent);
     }
 
     @Override
@@ -123,41 +130,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void enableBluetooth() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S){
-            if (checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_BT_1);
-            } else {
-                if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                }
-            }
-        } else {
-            if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT_2);
-            } else {
-                if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                }
-            }
-        }
-    }
-
-
     private void scanBluetooth() {
         String permission = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ? Manifest.permission.BLUETOOTH_ADMIN : Manifest.permission.BLUETOOTH_SCAN;
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{permission}, REQUEST_SCAN_BT);
             return;
         }
-        enableBluetooth();
-        unknownList.clear();
-        unknownListName.clear();
-        bluetoothAdapter.startDiscovery();
+        if (!enableBluetooth()){
+            return;
+        }
+        scanPairedDevices();
+        scanUnknownDevices();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void scanPairedDevices(){
         pairedList.clear();
         pairedList.addAll(bluetoothAdapter.getBondedDevices());
         pairedListName.clear();
@@ -168,10 +155,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("MissingPermission")
+    private void scanUnknownDevices(){
+        if (!bluetoothAdapter.isDiscovering()) {
+            unknownList.clear();
+            unknownListName.clear();
+            unknownListAdapter.notifyDataSetChanged();
+            bluetoothAdapter.startDiscovery();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     private void foundUnknownDevice(BluetoothDevice device){
         unknownList.add(device);
         unknownListName.add(device.getName());
         unknownListAdapter.notifyDataSetChanged();
+    }
+
+    private boolean enableBluetooth() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S){
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_BT_1);
+            } else {
+                if (bluetoothAdapter.isEnabled()) {
+                    return true;
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
+            }
+        } else {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT_2);
+            } else {
+                if (bluetoothAdapter.isEnabled()) {
+                    return true;
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -180,14 +206,14 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_ENABLE_BT_1:
                 if(grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    enableBluetooth();
+                    scanBluetooth();
                 } else {
                     Toast.makeText(this, BLUETOOTH_PERMISSION_MSG, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case REQUEST_ENABLE_BT_2:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableBluetooth();
+                    scanBluetooth();
                 } else {
                     Toast.makeText(this, BLUETOOTH_PERMISSION_MSG, Toast.LENGTH_SHORT).show();
                 }
@@ -203,13 +229,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
-                if (resultCode != RESULT_OK) {
+                if (resultCode == RESULT_OK){
+                    scanBluetooth();
+                } else {
                     Toast.makeText(this, BLUETOOTH_ENABLE_MSG, Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -217,6 +244,5 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, UNKNOWN_RESULT_MSG, Toast.LENGTH_SHORT).show();
         }
     }
-
 
 }
