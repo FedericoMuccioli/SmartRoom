@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Dashboard</title>
+</head>
+<body>
+    <h1>Room Dashboard</h1>
+    <form action="#" id="richiedidati">
+        <fieldset>
+            <legend>RICHIEDI DATI</legend>
+            <input type="date" id="date" required>
+            <input type="submit" value="Richiedi">
+        </fieldset>
+    </form>
+    <form action="#" id="stanza">
+        <fieldset>
+            <legend>CAMBIA STATO STANZA</legend>
+            <label for="lights">Lights</label>
+            <input type="checkbox" id="lights"/>
+            <label for="slider" id="sliderlabel">Posizione Persiane: 0%</label>
+            <input type="range" min="0" max="100" value="0" id="slider"/>
+            <input type="submit" value="Invia">
+        </fieldset>
+    </form>
+    <h2 id="errore"></h2>
+    <h2 id="giornodati">Dati del giorno: </h2>
+    <table>
+        <thead>
+            <tr>
+              <th>Orario</th>
+              <th>Luci</th>
+              <th>Persiane</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+    </table>
+</body>
+<script src="script.js"></script>
+</html>
