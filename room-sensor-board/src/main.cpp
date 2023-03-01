@@ -6,8 +6,13 @@
 #include "devices/Pir.h"
 #include "devices/photoresistor.h"
 
-TaskHandle_t Task1;
-enum {OFF, ON} state;
+typedef enum{
+  OFF,
+  ON
+} State;
+
+TaskHandle_t RoomStateTask;
+State state;
 Led* led;
 Pir* pir;
 Photoresistor* photoresistor;
@@ -66,29 +71,38 @@ void reconnect() {
   }
 }
 
+void sendUpdate(State s){
+  char luminosity[100];
+  sprintf(luminosity, "LUMINOSITY: %d", photoresistor->getLuminosity());
+  client.publish(MQTT_TOPIC, "MOVEMENT_DETECTED:" + s);
+  client.publish(MQTT_TOPIC, luminosity);
+  Serial.println(s);
+  Serial.println(luminosity);
+}
+
 void checkRoomState( void * parameter ){
   while(true){
     switch (state){
       case ON:
         if(!pir->checkDifference()){
-          client.publish(MQTT_TOPIC, "MOVEMENT_DETECTED: OFF");
-          client.publish(MQTT_TOPIC, "LUMINOSITY: ");
           led->switchOff();
           state = OFF;
+          sendUpdate(state);
         }
         break;
       case OFF:
         if(pir->checkDifference()){
-          client.publish(MQTT_TOPIC, "MOVEMENT_DETECTED: ON");
-          client.publish(MQTT_TOPIC, "LUMINOSITY:");
           led->switchOn();
           state = ON;
+          sendUpdate(state);
         }
         break;
     }
     delay(1000);
   }
 }
+
+
 
 void setup() {
   Serial.begin(115200);
@@ -98,11 +112,10 @@ void setup() {
   client.setCallback(callback);
   led = new Led(LED_PIN);
   pir = new Pir(PIR_PIN);
-
-  Photoresistor* photoresistor = new Photoresistor(PHOTORESISTOR_PIN);
+  photoresistor = new Photoresistor(PHOTORESISTOR_PIN);
   led->switchOff();
   state = OFF;
-  xTaskCreatePinnedToCore(checkRoomState,"Task1",10000,NULL,1,&Task1,0);
+  xTaskCreatePinnedToCore(checkRoomState,"checkRoomStateTask",10000,NULL,1,&RoomStateTask,0);
   delay(500);
 }
 
