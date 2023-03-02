@@ -15,6 +15,7 @@ private:
   Light* led;
   ServoMotor* motor;
   MsgServiceBT* msgBT;
+  void doCommand(Msg *msg);
 
 public:
   SmartLightingTask(MsgServiceBT* msgBT);  

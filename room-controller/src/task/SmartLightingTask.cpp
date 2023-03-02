@@ -2,81 +2,60 @@
 #include "SmartLightingTask.h"
 #include "config.h"
 
-//#define MSG(state) (state == ON ? String("ON") : state == OFF ? String("OFF") : String("DISABLE"))
-
 SmartLightingTask::SmartLightingTask(MsgServiceBT* msgBT){
   led = new Led(LED_PIN);
   motor = new ServoMotorImpl(MOTOR_PIN);
   this->msgBT = msgBT;
 }
-  
+
 void SmartLightingTask::init(int period){
   Task::init(period);
   led->switchOff();
   motor->on();
   motor->setPosition(0);
   state = ON;
-  //MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
 }
-  
+
 void SmartLightingTask::tick(){
   switch (state){
     case ON:
-      //led->switchLight();
-      //motor->setPosition(random(0,180));
-      if(msgBT->isMsgAvailable()){
-        Msg *msg = msgBT->receiveMsg();
-        String string = msg->getContent();
-        delete msg;
-        char code = string.charAt(0);
-        int value = string.substring(1).toInt();
-        switch(code){
-        case 'l':
-          if(value == 2){
-            led->switchLight();
-          }
-          break;
-        case 'd':
-          motor->setPosition(map(value, 0, 100, 0, 180));
-          break;
-        }
-      }
-      break;
-    case OFF:
       if(MsgSerial.isMsgAvailable()){
-        Msg *msg = MsgSerial.receiveMsg();
-        String string = msg->getContent();
-        delete msg;
-        char code = string.charAt(0);
-        int value = string.substring(1).toInt();
-        switch(code){
-        case 'l':
-          if(value){
-            led->switchOn();
-          } else{
-            led->switchOff();
-          }
-          break;
-        case 'd':
-          motor->setPosition(value);
-          break;
-        }
+         Msg *msg = MsgSerial.receiveMsg();
+         doCommand(msg);
+      } else if(msgBT->isMsgAvailable()){
+        Msg *msg = msgBT->receiveMsg();
+        doCommand(msg);
       }
       break;
-    /*
-      if (smartLighting->isSomeoneDetected()){
-        smartLighting->turnLightOn();
-        state = ON;
-        MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
-      }
-      break;
-    case ON:
-      if (!(smartLighting->isSomeoneDetected())){
-        smartLighting->turnLightOff();
-        state = OFF;
-        MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
-      }
-      break;
-      */
   }
 }
+
+void SmartLightingTask::doCommand(Msg *msg){
+  String string = msg->getContent();
+  Serial.println(string);//CANCELLARE
+  delete msg;
+  char code = string.charAt(0);
+  int value = string.substring(1).toInt();
+  switch(code){
+    case 'l':
+      switch (value){
+        case 0:
+          led->switchOff();
+          break;
+        case 1:
+          led->switchOn();
+          break;
+        case 2:
+          led->switchLight();
+          break;
+        }
+      break;
+    case 'd':
+      motor->setPosition(map(value, 0, 100, 0, 180));
+      break;
+  }
+}
+
+//#define MSG(state) (state == ON ? String("ON") : state == OFF ? String("OFF") : String("DISABLE"))
+//MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
+
