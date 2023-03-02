@@ -30,7 +30,7 @@ public class ControllerActivity extends AppCompatActivity implements Handler {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_room);
+        setContentView(R.layout.activity_controller);
         device = getIntent().getParcelableExtra(DiscoveryActivity.CONNECTED_DEVICE);
     }
 
