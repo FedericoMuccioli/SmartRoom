@@ -1,6 +1,6 @@
 package com.example.roomapp;
 
-public interface Enable {
+public interface Handler {
 
     void enable();
 

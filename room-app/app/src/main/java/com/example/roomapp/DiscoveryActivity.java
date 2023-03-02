@@ -2,14 +2,11 @@ package com.example.roomapp;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,20 +14,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class DiscoveryActivity extends AppCompatActivity {
 
     public static final String CONNECTED_DEVICE = "CONNECTED_DEVICE";
     private static final String BLUETOOTH_NO_SUPPORT_MSG = "Bluetooth not supported!";
@@ -52,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private List<String> unknownListName;
     private ArrayAdapter<String> pairedListAdapter;
     private ArrayAdapter<String> unknownListAdapter;
+    private boolean tryScan = false;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -66,14 +58,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bluetoothAdapter = getSystemService(BluetoothManager.class).getAdapter();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkSupportedBluetooth();
+        createUI();
+        registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        scanBluetooth();
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onPause() {
+        super.onPause();
+        bluetoothAdapter.cancelDiscovery();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+    private void createUI() {
         pairedListView = findViewById(R.id.pairedList);
         unknownListView = findViewById(R.id.unknownList);
         discoveryButton = findViewById(R.id.discoveryButton);
         discoveryButton.setOnClickListener((v) -> scanBluetooth());
-
-        bluetoothAdapter = getSystemService(BluetoothManager.class).getAdapter();
-        registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
         pairedList = new ArrayList<>();
         pairedListName = new ArrayList<>();
@@ -89,40 +103,15 @@ public class MainActivity extends AppCompatActivity {
         unknownListView.setOnItemClickListener((adapterView, view, i, l) -> {
             clickedDevice(unknownList.get(i));
         });
-
-        checkSupportedBluetooth();
-        scanBluetooth();
     }
-
     private void clickedDevice(final BluetoothDevice device) {
-        Intent intent = new Intent(this, RoomActivity.class);
+        if (!enableBluetooth()) {
+            return;
+        }
+        Intent intent = new Intent(this, ControllerActivity.class);
         intent.putExtra(CONNECTED_DEVICE, device);
         startActivity(intent);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onStop() {
-        super.onStop();
-        bluetoothAdapter.cancelDiscovery();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
-    }
-
     private void checkSupportedBluetooth() {
         if (bluetoothAdapter == null) {
             Toast.makeText(this, BLUETOOTH_NO_SUPPORT_MSG, Toast.LENGTH_SHORT).show();
@@ -137,10 +126,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (!enableBluetooth()){
+            tryScan = true;
             return;
         }
         scanPairedDevices();
         scanUnknownDevices();
+        tryScan = false;
     }
 
     @SuppressLint("MissingPermission")
@@ -206,14 +197,14 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_ENABLE_BT_1:
                 if(grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    scanBluetooth();
+                    tryScanOrEnableBluetooth();
                 } else {
                     Toast.makeText(this, BLUETOOTH_PERMISSION_MSG, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case REQUEST_ENABLE_BT_2:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    scanBluetooth();
+                    tryScanOrEnableBluetooth();
                 } else {
                     Toast.makeText(this, BLUETOOTH_PERMISSION_MSG, Toast.LENGTH_SHORT).show();
                 }
@@ -235,13 +226,21 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK){
-                    scanBluetooth();
+                    tryScanOrEnableBluetooth();
                 } else {
                     Toast.makeText(this, BLUETOOTH_ENABLE_MSG, Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
                 Toast.makeText(this, UNKNOWN_RESULT_MSG, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void tryScanOrEnableBluetooth(){
+        if (tryScan){
+            scanBluetooth();
+        } else {
+            enableBluetooth();
         }
     }
 

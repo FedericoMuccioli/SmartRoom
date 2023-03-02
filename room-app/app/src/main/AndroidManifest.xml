@@ -31,10 +31,10 @@
         android:theme="@style/Theme.RoomApp"
         tools:targetApi="31">
         <activity
-            android:name=".RoomActivity"
+            android:name=".ControllerActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".DiscoveryActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

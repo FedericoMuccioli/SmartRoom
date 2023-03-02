@@ -9,17 +9,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-public class BluetoothCommunicationChannelThread extends Thread {
+public class BluetoothRoomChannel extends Thread {
+
+    private static final String LOG_TAG = "BluetoothRoomChannel";
 
     private final BluetoothSocket socket;
     private OutputStream outputStream;
-    private Enable handler;
+    private Handler handler;
 
 
     @SuppressLint("MissingPermission")
-    public BluetoothCommunicationChannelThread(final BluetoothDevice device, final UUID uuid, final Enable handler) throws IOException {
+    public BluetoothRoomChannel(final BluetoothDevice device, final UUID uuid, final Handler handler) throws IOException {
         socket = device.createRfcommSocketToServiceRecord(uuid);
         this.handler = handler;
     }
@@ -31,12 +32,17 @@ public class BluetoothCommunicationChannelThread extends Thread {
             outputStream = socket.getOutputStream();
             handler.enable();
         } catch (IOException e) {
+            Log.e(LOG_TAG, "Error connecting socket", e);
             throw new RuntimeException(e);
         }
     }
 
-    public void cancel() throws IOException {
-        socket.close();
+    public void cancel() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error closing socket", e);
+        }
     }
 
     public void turnLight() {
@@ -45,7 +51,7 @@ public class BluetoothCommunicationChannelThread extends Thread {
                 String message = "l2\n";
                 outputStream.write(message.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Log.e(LOG_TAG, "Error turning on the light", e);
             }
         }).start();
     }
@@ -56,7 +62,7 @@ public class BluetoothCommunicationChannelThread extends Thread {
                 String message = "d" + String.valueOf(percentage) + "\n";
                 outputStream.write(message.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Log.e(LOG_TAG, "Error setting the roller blinds", e);
             }
         }).start();
     }
