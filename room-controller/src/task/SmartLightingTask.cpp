@@ -13,26 +13,18 @@ void SmartLightingTask::init(int period){
   led->switchOff();
   motor->on();
   motor->setPosition(0);
-  state = ON;
 }
 
 void SmartLightingTask::tick(){
-  switch (state){
-    case ON:
-      if(MsgSerial.isMsgAvailable()){
-         Msg *msg = MsgSerial.receiveMsg();
-         doCommand(msg);
-      } else if(msgBT->isMsgAvailable()){
-        Msg *msg = msgBT->receiveMsg();
-        doCommand(msg);
-      }
-      break;
+  if(MsgSerial.isMsgAvailable()){
+      doCommand(MsgSerial.receiveMsg());
+  } else if(msgBT->isMsgAvailable()){
+    doCommand(msgBT->receiveMsg());
   }
 }
 
 void SmartLightingTask::doCommand(Msg *msg){
   String string = msg->getContent();
-  Serial.println(string);//CANCELLARE
   delete msg;
   char code = string.charAt(0);
   int value = string.substring(1).toInt();
@@ -51,9 +43,16 @@ void SmartLightingTask::doCommand(Msg *msg){
         }
       break;
     case 'd':
-      motor->setPosition(map(value, 0, 100, 0, 180));
+      motor->setPosition(value);
       break;
   }
+  notifyServer();
+}
+
+void SmartLightingTask::notifyServer(){
+  String lightStateMsg =  String('l' + String(led->isOn() ? '1' : '0'));
+  String rollerBlindsStateMsg = String('d' + String(motor->getPosition()));
+  MsgSerial.sendMsg(lightStateMsg + '&' + rollerBlindsStateMsg);
 }
 
 //#define MSG(state) (state == ON ? String("ON") : state == OFF ? String("OFF") : String("DISABLE"))

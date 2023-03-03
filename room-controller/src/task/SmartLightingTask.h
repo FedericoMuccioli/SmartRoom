@@ -11,11 +11,11 @@
 class SmartLightingTask: public Task {
 
 private:
-  enum {OFF, ON, DISABLE} state;
   Light* led;
   ServoMotor* motor;
   MsgServiceBT* msgBT;
   void doCommand(Msg *msg);
+  void notifyServer();
 
 public:
   SmartLightingTask(MsgServiceBT* msgBT);  

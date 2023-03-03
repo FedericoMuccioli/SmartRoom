@@ -13,15 +13,15 @@ void ServoMotorImpl::off(){
   motor.detach();    
 }
 
-//set position from 0 to 180
-void ServoMotorImpl::setPosition(int angle){
+void ServoMotorImpl::setPosition(int percentage){
+  int angle = map(percentage, 0, 100, 0, 180);
   float coeff = (2250.0-750.0)/180;
   this->angle = angle < 0 ? 0 : angle > 180 ? 180 : angle;
   motor.write(750 + this->angle*coeff);              
 }
 
 int ServoMotorImpl::getPosition(){
-  return angle;
+  return map(angle, 0, 180, 0, 100);;
 }
 
 

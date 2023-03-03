@@ -24,3 +24,7 @@ void Led::switchLight(){
     switchOn();
   }
 }
+
+bool Led::isOn(){
+  return state; 
+}

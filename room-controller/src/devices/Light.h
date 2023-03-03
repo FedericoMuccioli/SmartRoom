@@ -6,6 +6,7 @@ public:
   virtual void switchOn() = 0;
   virtual void switchOff() = 0;  
   virtual void switchLight() = 0;  
+  virtual bool isOn() = 0;
 };
 
 #endif
