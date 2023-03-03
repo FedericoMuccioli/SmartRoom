@@ -73,11 +73,16 @@ void reconnect() {
 
 void sendUpdate(State s){
   char luminosity[100];
+  char Movement[100];
+  char Event[200];
+
   sprintf(luminosity, "LUMINOSITY: %d", photoresistor->getLuminosity());
-  client.publish(MQTT_TOPIC, "MOVEMENT_DETECTED:" + s);
-  client.publish(MQTT_TOPIC, luminosity);
-  Serial.println(s);
-  Serial.println(luminosity);
+  sprintf(Movement, "MOVEMENT_DETECTED: %s", (state == ON ? "ON" : "OFF"));
+  strcpy(Event, Movement);
+  strcat(Event, " & ");
+  strcat(Event, luminosity);
+  client.publish(MQTT_TOPIC, Event);
+  Serial.println(Event);
 }
 
 void checkRoomState( void * parameter ){
