@@ -1,20 +1,19 @@
 package communication;
 
+import controller.Controller;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.mqtt.MqttClient;
-import logic.logic;
 
 /*
  * MQTT Agent
  */
 public class MQTTAgent extends AbstractVerticle {
 
-	private logic logic;
+	private Controller controller;
 
-	public MQTTAgent(logic logic) {
-		this.logic = logic;
+	public MQTTAgent(Controller controller) {
+		this.controller = controller;
 	}
-	
 
 	@Override
 	public void start() {
@@ -25,7 +24,10 @@ public class MQTTAgent extends AbstractVerticle {
 			log("subscribing...");
 			client.publishHandler(s -> {
 				log(s.payload().toString());
-				logic.UpdateLogic(s.payload().toString());
+				String[] msgArray = s.payload().toString().split("&");
+				String motionValue = msgArray[0].split(":")[1];
+				int luminosityValue = Integer.parseInt(msgArray[1].split(": ")[1]);
+				controller.updateRoom(motionValue, luminosityValue);
 			})
 			.subscribe("ESP32-IoT-2023", 2);
 		});
