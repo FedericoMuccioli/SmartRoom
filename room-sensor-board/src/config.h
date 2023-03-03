@@ -8,7 +8,7 @@
 #define WIFI_SSID "ssid"
 #define WIFI_PASSWORD "psw"
 #define MQTT_SERVER_ADDRESS "broker.hivemq.com"
-#define MQTT_TOPIC "-ESP32-IoT-2023"
+#define MQTT_TOPIC "ESP32-IoT-2023"
 
 #define MSG_BUFFER_SIZE  50
 
