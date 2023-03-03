@@ -24,8 +24,8 @@ public class MQTTAgent extends AbstractVerticle {
 			log("subscribing...");
 			client.publishHandler(s -> {
 				log(s.payload().toString());
-				String[] msgArray = s.payload().toString().split("&");
-				String motionValue = msgArray[0].split(":")[1];
+				String[] msgArray = s.payload().toString().split(" & ");
+				String motionValue = msgArray[0].split(": ")[1];
 				int luminosityValue = Integer.parseInt(msgArray[1].split(": ")[1]);
 				controller.updateRoom(motionValue, luminosityValue);
 			})

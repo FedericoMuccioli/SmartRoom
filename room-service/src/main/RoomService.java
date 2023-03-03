@@ -26,18 +26,15 @@ public class RoomService {
 	public static void main(String[] args) throws Exception {
 		final String port = args[0];
 
-		CommChannel comm = new SerialCommChannel(port, BAUD);
-		System.out.println("Waiting Arduino for rebooting...");
-		Thread.sleep(5000);
-		System.out.println("Ready.");
+//		CommChannel comm = new SerialCommChannel(port, BAUD);
+//		System.out.println("Waiting Arduino for rebooting...");
+//		Thread.sleep(5000);
+//		System.out.println("Ready.");
 
-		RoomControllerComm controllerComm = new RoomControllerComm(comm);
 		JsonManager jm = new JsonManager();
-		logic logic = new logic(jm);
-
-		Controller controller = new Controller(controllerComm, logic, jm);
-
+		logic logic = new logic();
 		Vertx vertx = Vertx.vertx();
+		Controller controller = new Controller(port, BAUD, logic, jm);
 		MQTTAgent agent = new MQTTAgent(controller);
 		vertx.deployVerticle(agent);
 	}

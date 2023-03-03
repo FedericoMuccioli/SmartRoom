@@ -1,28 +1,51 @@
 package communication;
 
-public class RoomControllerComm {
+import controller.Controller;
+import jssc.SerialPortEvent;
+
+public class RoomControllerComm extends SerialCommChannel {
 	
 	private final static String LIGHT = "l";
 	private final static String ROLLER_BLINDS = "d";
 	private final static String REGEX = "&";
 	
-	private final CommChannel comm;
+	private Controller controller;
 	private int light;
 	private int rollerBlinds;
 	
-	public RoomControllerComm(final CommChannel commChannel) {
-		this.comm = commChannel;
+	public RoomControllerComm(final String port, final int rate, final Controller controller) throws Exception {
+		super(port, rate);
+		this.controller = controller;
 	}
 	
-	public boolean isChangeState() {
+	public void setLight(final boolean light) {
+		sendMsg(LIGHT + (light == true ? "1" : "0"));
+	}
+	
+	public void setRollerBlinds(final int degree) {
+		sendMsg(ROLLER_BLINDS + String.valueOf(degree));
+	}
+	
+	public int getLight() {
+		return light;
+	}
+
+	public int getRollerBlinds() {
+		return rollerBlinds;
+	}
+	
+	public void serialEvent(SerialPortEvent event) {
+		super.serialEvent(event);
 		String state = null;
-		while (comm.isMsgAvailable()) {
+		while (isMsgAvailable()) {
 			try {
-				state = comm.receiveMsg();
+				state = receiveMsg();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				return false;
+				return;
 			}
+		}
+		if(state != null) {
 			var split = state.split(REGEX);
 			for (String s : split) {
 				String typeValue = Character.toString(s.charAt(0));
@@ -33,24 +56,8 @@ public class RoomControllerComm {
 					rollerBlinds = value;
 				}
 			}
+			controller.notifyChangeRoom(light, rollerBlinds);
 		}
-		return state != null;
-	}
-	
-	public void setLight(final boolean light) {
-		comm.sendMsg(LIGHT + (light == true ? "1" : "0"));
-	}
-	
-	public void setRollerBlinds(final int degree) {
-		comm.sendMsg(ROLLER_BLINDS + String.valueOf(degree));
-	}
-	
-	public int getLight() {
-		return light;
-	}
-
-	public int getRollerBlinds() {
-		return rollerBlinds;
 	}
 
 }
