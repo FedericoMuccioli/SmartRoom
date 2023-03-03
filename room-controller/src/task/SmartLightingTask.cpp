@@ -17,7 +17,7 @@ void SmartLightingTask::init(int period){
 
 void SmartLightingTask::tick(){
   if(MsgSerial.isMsgAvailable()){
-      doCommand(MsgSerial.receiveMsg());
+    doCommand(MsgSerial.receiveMsg());
   } else if(msgBT->isMsgAvailable()){
     doCommand(msgBT->receiveMsg());
   }

@@ -23,6 +23,3 @@ void ServoMotorImpl::setPosition(int percentage){
 int ServoMotorImpl::getPosition(){
   return map(angle, 0, 180, 0, 100);;
 }
-
-
-
