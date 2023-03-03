@@ -2,43 +2,44 @@ package Json;
 import java.io.*;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.io.FileReader;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-
-
 public class JsonManager {
-	
-	public boolean CreateNewJson(String nome, String time, String lights, String position) {
-		File filejson = new File("res/"+nome+".json");
-        if (filejson.exists()) {
-        	return false;
+
+    public void UpdateJSON(int light, int rollerBlinds){
+        String Date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String Time = LocalTime.now().getHour() + ":" + LocalTime.now().getMinute() + ":" + LocalTime.now().getSecond();
+        if(checkFileExisting(Date)){
+            AddRowToJSON(Date, Time, light, rollerBlinds);
+        }else{
+            CreateNewJson(Date, Time, light, rollerBlinds);
         }
-		
-        JSONArray jsonArray = new JSONArray();		
+    }
+
+	private boolean CreateNewJson(String filename, String time, int lights, int position) {
+        JSONArray jsonArray = new JSONArray();
 		JSONObject obj = new JSONObject();
 		obj.put("time", time);
 		obj.put("lights", lights);
 		obj.put("position", position);
-        // Aggiunta del nuovo oggetto all'array JSON
         jsonArray.put(obj);
-		// Stampa dell'oggetto JSON
-		System.out.println(obj);
-        try (FileWriter file = new FileWriter("res/"+nome+".json")) {
+        try (FileWriter file = new FileWriter("res/"+filename+".json")) {
             file.write(jsonArray.toString());
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
 	}
-	
-	public boolean AddRowToJSON(String nome, String time, String lights, String position) {
+
+	private boolean AddRowToJSON(String filename, String time, int lights, int position) {
 		try {
-            // Lettura del contenuto del file JSON
-            FileReader fileReader = new FileReader("res/"+nome+".json");
+            FileReader fileReader = new FileReader("res/"+filename+".json");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             StringBuilder stringBuilder = new StringBuilder();
             String line = bufferedReader.readLine();
@@ -47,25 +48,24 @@ public class JsonManager {
                 line = bufferedReader.readLine();
             }
             String jsonString = stringBuilder.toString();
-            
-            // Conversione del contenuto in JSONArray
             JSONArray jsonArray = new JSONArray(jsonString);
-            // Creazione di un nuovo oggetto JSON
             JSONObject newJsonObject = new JSONObject();
             newJsonObject.put("time", time);
             newJsonObject.put("lights", lights);
             newJsonObject.put("position", position);
-            // Aggiunta del nuovo oggetto all'array JSON
             jsonArray.put(newJsonObject);
-            // Scrittura del nuovo array JSON su file
-            FileWriter fileWriter = new FileWriter("res/"+nome+".json");
+            FileWriter fileWriter = new FileWriter("res/"+filename+".json");
             fileWriter.write(jsonArray.toString());
             fileWriter.close();
+            bufferedReader.close();
             return true;
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
             return false;
         }
     }
-	
+
+    private boolean checkFileExisting(String filename) {
+		File filejson = new File("res/"+filename+".json");
+        return filejson.exists();
+    }
 }
