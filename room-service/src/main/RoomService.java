@@ -3,11 +3,16 @@ import communication.CommChannel;
 import communication.RoomControllerComm;
 import communication.SerialCommChannel;
 import controller.Controller;
+import io.vertx.core.Vertx;
+import io.vertx.core.AbstractVerticle;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import Json.JsonManager;
+import communication.MQTTAgent;
+import logic.logic;
 
 public class RoomService {
 	
@@ -25,26 +30,35 @@ public class RoomService {
 	 * @throws Exception if port incorrect
 	 */
 	public static void main(String[] args) throws Exception {
-		//final String port = args[0];
-		
-		//CommChannel comm = new SerialCommChannel(port, BAUD);
-		//System.out.println("Waiting Arduino for rebooting...");
-		//Thread.sleep(5000);
+		final String port = args[0];
+
+		CommChannel comm = new SerialCommChannel(port, BAUD);
+		System.out.println("Waiting Arduino for rebooting...");
+		Thread.sleep(5000);
 		System.out.println("Ready.");
-		
-		//Controller controller = new Controller(new RoomControllerComm(comm));
-		//controller.start();
-		
+
+		RoomControllerComm controllerComm = new RoomControllerComm(comm);
+		Controller controller = new Controller(controllerComm);
+		controller.start();
+
 		JsonManager jm = new JsonManager();
-		
-		//jm.CreateNewJson("today", "10:30", "ON", "80");
-		
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String formattedDate = today.format(formatter);
-        
-        jm.CreateNewJson(formattedDate, "10:30", "ON", "80");
-		jm.AddRowToJSON(formattedDate, "10:45", "OFF", "52");
+		logic logic = new logic(controllerComm,jm);
+
+
+		// //jm.CreateNewJson("today", "10:30", "ON", "80");
+
+        // LocalDate today = LocalDate.now();
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        // String formattedDate = today.format(formatter);
+
+        // jm.CreateNewJson(formattedDate, "10:30", "ON", "80");
+		// jm.AddRowToJSON(formattedDate, "10:45", "OFF", "52");
+
+		Vertx vertx = Vertx.vertx();
+		MQTTAgent agent = new MQTTAgent(logic);
+		vertx.deployVerticle(agent);
+		// LocalTime oraCorrente = LocalTime.now();
+		// System.out.println(oraCorrente);
 	}
 
 }
