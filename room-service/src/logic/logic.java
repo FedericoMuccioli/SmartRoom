@@ -1,7 +1,6 @@
 package logic;
 
 import java.time.LocalTime;
-import Json.JsonManager;
 
 public class logic {
 
@@ -22,7 +21,7 @@ public class logic {
         }else{
             //Luci spente
             ArrayValues[0] = "OFF";
-            if(oraCorrente>=19 && oraCorrente<8){
+            if(oraCorrente>=19 || oraCorrente<8){
                 //Persiane tutte giù
                 ArrayValues[1] = "100";
             }
