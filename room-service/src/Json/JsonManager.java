@@ -18,6 +18,11 @@ public class JsonManager {
         if(checkFileExisting(Date)){
             AddRowToJSON(Date, Time, light, rollerBlinds);
         }else{
+            String path = "res";
+            File directory = new File(path);
+            if (!directory.exists()) {
+                createDir(path);
+            }
             CreateNewJson(Date, Time, light, rollerBlinds);
         }
     }
@@ -67,5 +72,9 @@ public class JsonManager {
     private boolean checkFileExisting(String filename) {
 		File filejson = new File("res/"+filename+".json");
         return filejson.exists();
+    }
+
+    private boolean createDir(String path) {
+        return new File(path).mkdir();
     }
 }
