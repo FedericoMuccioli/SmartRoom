@@ -16,22 +16,15 @@ State state;
 Led* led;
 Pir* pir;
 Photoresistor* photoresistor;
-
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-/* MQTT server address */
-const char* mqtt_server = MQTT_SERVER_ADDRESS;
-/* MQTT topic */
-const char* topic = MQTT_TOPIC;
 /* MQTT client management */
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup_wifi() {
   delay(10);
-  Serial.println(String("Connecting to ") + ssid);
+  Serial.println(String("Connecting to ") + WIFI_SSID);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -52,19 +45,13 @@ void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    // Create a random client ID
-    // String clientId = String("esiot-2122-client-")+String(random(0xffff), HEX);
-    // Attempt to connect
-    if (client.connect("esiot-2122-client1")) {
+    // Attempt to connect with a random client ID
+    if (client.connect((String("IoT-client-")+String(random(0xffff), HEX)).c_str())) {
       Serial.println("connected");
-      // Once connected, publish an announcement...
-      // client.publish("outTopic", "hello world");
-      // ... and resubscribe
-      client.subscribe(topic);
+      // Once connected, resubscribe
+      client.subscribe(MQTT_TOPIC);
     } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.print("failed, try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -107,13 +94,11 @@ void checkRoomState( void * parameter ){
   }
 }
 
-
-
 void setup() {
   Serial.begin(115200);
   setup_wifi();
   randomSeed(micros());
-  client.setServer(mqtt_server, 1883);
+  client.setServer(MQTT_SERVER_ADDRESS, 1883);
   client.setCallback(callback);
   led = new Led(LED_PIN);
   pir = new Pir(PIR_PIN);
