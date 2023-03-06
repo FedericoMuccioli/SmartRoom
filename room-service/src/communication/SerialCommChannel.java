@@ -110,4 +110,5 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
             }
         }
 	}
+	
 }

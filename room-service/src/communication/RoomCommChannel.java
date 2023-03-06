@@ -37,26 +37,26 @@ public class RoomCommChannel extends SerialCommChannel {
 	public void serialEvent(SerialPortEvent event) {
 		super.serialEvent(event);
 		String state = null;
-		while (isMsgAvailable()) {
-			try {
+		try {
+			while (isMsgAvailable()) {
 				state = receiveMsg();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				return;
 			}
-		}
-		if(state != null) {
-			var split = state.split(REGEX);
-			for (String s : split) {
-				String typeValue = Character.toString(s.charAt(0));
-				final int value = Integer.parseInt(s.substring(1));
-				if (typeValue.equals(LIGHT)) {
-					light = value;
-				} else if (typeValue.equals(ROLLER_BLINDS)) {
-					rollerBlinds = value;
+			if(state != null) {
+				var split = state.split(REGEX);
+				for (String s : split) {
+					String typeValue = Character.toString(s.charAt(0));
+					final int value = Integer.parseInt(s.substring(1));
+					if (typeValue.equals(LIGHT)) {
+						light = value;
+					} else if (typeValue.equals(ROLLER_BLINDS)) {
+						rollerBlinds = value;
+					}
 				}
+				controller.notifyChangeRoom(light, rollerBlinds);
 			}
-			controller.notifyChangeRoom(light, rollerBlinds);
+		} catch (Exception e) {
+			System.out.println(state);
+			return;
 		}
 	}
 

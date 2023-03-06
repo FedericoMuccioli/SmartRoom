@@ -17,13 +17,13 @@ void SmartLightingTask::init(int period){
 
 void SmartLightingTask::tick(){
   if(MsgSerial.isMsgAvailable()){
-    doCommand(MsgSerial.receiveMsg());
+    updateRoom(MsgSerial.receiveMsg());
   } else if(msgBT->isMsgAvailable()){
-    doCommand(msgBT->receiveMsg());
+    updateRoom(msgBT->receiveMsg());
   }
 }
 
-void SmartLightingTask::doCommand(Msg *msg){
+void SmartLightingTask::updateRoom(Msg *msg){
   String string = msg->getContent();
   delete msg;
   char code = string.charAt(0);
@@ -54,7 +54,3 @@ void SmartLightingTask::notifyServer(){
   String rollerBlindsStateMsg = String('d' + String(motor->getPosition()));
   MsgSerial.sendMsg(lightStateMsg + '&' + rollerBlindsStateMsg);
 }
-
-//#define MSG(state) (state == ON ? String("ON") : state == OFF ? String("OFF") : String("DISABLE"))
-//MsgService.sendMsg(SMART_LIGHTING_STATE_MSG + MSG(state));
-

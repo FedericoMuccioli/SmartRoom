@@ -29,7 +29,7 @@ bool Scheduler::addTask(Task* task){
   
 void Scheduler::schedule(){   
   while (!timerFlag){
-    //sleepNow();
+    sleepNow();
   }
   timerFlag = false;
   for (int i = 0; i < nTasks; i++){
@@ -40,8 +40,8 @@ void Scheduler::schedule(){
 }
 
 void Scheduler::sleepNow(){
-    set_sleep_mode(SLEEP_MODE_IDLE);
-    sleep_enable();
-    sleep_mode();
-    sleep_disable();
+  set_sleep_mode(SLEEP_MODE_IDLE);
+  sleep_enable();
+  sleep_mode();
+  sleep_disable();
 }

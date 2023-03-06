@@ -12,7 +12,7 @@ public:
 
   void on();
   void off();
-  void setPosition(int angle);
+  void setPosition(int percentage);
   int getPosition();
     
 private:
