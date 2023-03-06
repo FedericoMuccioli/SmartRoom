@@ -1,4 +1,4 @@
-package Json;
+package json;
 import java.io.*;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,22 +12,22 @@ import org.json.JSONException;
 
 public class JsonManager {
 
-    public void UpdateJSON(int light, int rollerBlinds){
+    public void updateJSON(final int light, final int rollerBlinds){
         String Date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         String Time = LocalTime.now().getHour() + ":" + LocalTime.now().getMinute() + ":" + LocalTime.now().getSecond();
         if(checkFileExisting(Date)){
-            AddRowToJSON(Date, Time, light, rollerBlinds);
+            addRowToJSON(Date, Time, light, rollerBlinds);
         }else{
             String path = "res";
             File directory = new File(path);
             if (!directory.exists()) {
                 createDir(path);
             }
-            CreateNewJson(Date, Time, light, rollerBlinds);
+            createNewJson(Date, Time, light, rollerBlinds);
         }
     }
 
-	private boolean CreateNewJson(String filename, String time, int lights, int position) {
+	private boolean createNewJson(final String filename, final String time, final int lights, final int position) {
         JSONArray jsonArray = new JSONArray();
 		JSONObject obj = new JSONObject();
 		obj.put("time", time);
@@ -42,7 +42,7 @@ public class JsonManager {
         }
 	}
 
-	private boolean AddRowToJSON(String filename, String time, int lights, int position) {
+	private boolean addRowToJSON(final String filename, final String time, final int lights, final int position) {
 		try {
             FileReader fileReader = new FileReader("res/"+filename+".json");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -69,7 +69,7 @@ public class JsonManager {
         }
     }
 
-    private boolean checkFileExisting(String filename) {
+    private boolean checkFileExisting(final String filename) {
 		File filejson = new File("res/"+filename+".json");
         return filejson.exists();
     }

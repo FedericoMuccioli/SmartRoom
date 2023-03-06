@@ -2,11 +2,11 @@ package logic;
 
 import java.time.LocalTime;
 
-public class logic {
+public class Logic {
 
     private final static int LIGHT_TRESHOLD = 400;
 
-    public String[] UpdateLogic(final String motion, final int luminosity) {
+    public String[] updateLogic(final String motion, final int luminosity) {
         int oraCorrente = (LocalTime.now()).getHour();
         String[] ArrayValues = {"null", "null"};
         if (motion.equals("ON")) {

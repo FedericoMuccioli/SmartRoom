@@ -1,9 +1,9 @@
 package main;
-import Json.JsonManager;
 import communication.MQTTAgent;
 import controller.Controller;
 import io.vertx.core.Vertx;
-import logic.logic;
+import json.JsonManager;
+import logic.Logic;
 
 public class RoomService {
 	
@@ -24,7 +24,7 @@ public class RoomService {
 		final String port = args[0];
 
 		JsonManager jm = new JsonManager();
-		logic logic = new logic();
+		Logic logic = new Logic();
 		Vertx vertx = Vertx.vertx();
 		Controller controller = new Controller(port, BAUD, logic, jm);
 		MQTTAgent agent = new MQTTAgent(controller);

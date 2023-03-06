@@ -1,23 +1,23 @@
 package controller;
 
-import Json.JsonManager;
 import communication.RoomCommChannel;
-import logic.logic;
+import json.JsonManager;
+import logic.Logic;
 
 public class Controller {
 
 	private final RoomCommChannel roomContrComm;
-	private final logic logic;
+	private final Logic logic;
 	private final JsonManager jm;
 
-	public Controller(final String port, final int rate, final logic logic, final JsonManager jm) throws Exception {
+	public Controller(final String port, final int rate, final Logic logic, final JsonManager jm) throws Exception {
 		this.roomContrComm = new RoomCommChannel(port, rate, this);
 		this.logic = logic;
 		this.jm = jm;
 	}
 
 	public void updateRoom(String movement, int luminosity) {
-		String[] values = logic.UpdateLogic(movement, luminosity);
+		String[] values = logic.updateLogic(movement, luminosity);
 		if(values[0] != "null") {
 			roomContrComm.setLight(values[0] == "ON");
 		}
@@ -30,7 +30,7 @@ public class Controller {
 		//DA CANCELLARE
 		System.out.println("light" + light);
 		System.out.println("rollerBlinds" + rollerBlinds);
-		jm.UpdateJSON(light, rollerBlinds);
+		jm.updateJSON(light, rollerBlinds);
 	}
 
 
