@@ -2,12 +2,14 @@ window.onload = () => {
     getData(new Date().toLocaleDateString());
 
     let richiedidati = document.getElementById('richiedidati');
+    let day = document.getElementById('date');
+    day.value = new Date().toISOString().substring(0, 10);
     richiedidati.addEventListener('submit', (e) => {
         e.preventDefault();
-        let day = document.getElementById('date').value;
-        day = day.split('-');
-        day = String(parseInt(day[1])) + '/' + String(parseInt(day[2])) + '/' + String(parseInt(day[0]));
-        getData(day);
+        let value = day.value;
+        value = value.split('-');
+        value = String(parseInt(value[1])) + '/' + String(parseInt(value[2])) + '/' + String(parseInt(value[0]));
+        getData(value);
     });
 
     let cambiastatoStanza = document.getElementById('stanza');
@@ -16,8 +18,8 @@ window.onload = () => {
         let timeValue = new Date().getHours() + ":" + new Date().getMinutes();
         let lightsValue = document.querySelector('#lights');
         lightsValue = lightsValue.checked ? "ON" : "OFF";
-        let angleValue = document.getElementById('slider').value;
-        const data = { time: timeValue, lights: lightsValue , angle: angleValue};
+        let positionValue = document.getElementById('slider').value;
+        const data = { time: timeValue, lights: lightsValue , position: positionValue};
         fetch('address', {
         method: 'POST',
         headers: {
@@ -62,13 +64,12 @@ function getData(day){
             const cellaLuci = riga.insertCell();
             const cellaPersiane = riga.insertCell();
             cellaOrario.innerText = elemento.time;
-            cellaLuci.innerText = elemento.lights;
-            cellaPersiane.innerText = elemento.angle;
+            cellaLuci.innerText = elemento.lights == "0" ? "Accese" : "Spente";
+            cellaPersiane.innerText = elemento.position + "%";
             errore.innerText = "";
         });
     } else {
-        console.error('Errore nella richiesta');
-        errore.innerText = "Errore nella richiesta";
+        errore.innerText = "Errore nella richiesta: dati non disponibili";
         tabella.style.visibility = "hidden";
         giornodati.style.visibility = "hidden";
     }
