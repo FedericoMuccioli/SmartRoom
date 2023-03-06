@@ -22,8 +22,8 @@ public class RoomCommChannel extends SerialCommChannel {
 		sendMsg(LIGHT + (light == true ? "1" : "0"));
 	}
 	
-	public void setRollerBlinds(final int degree) {
-		sendMsg(ROLLER_BLINDS + String.valueOf(degree));
+	public void setRollerBlinds(final int percentage) {
+		sendMsg(ROLLER_BLINDS + String.valueOf(percentage));
 	}
 	
 	@Override
