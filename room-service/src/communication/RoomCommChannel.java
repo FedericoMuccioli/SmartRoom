@@ -6,7 +6,7 @@ import jssc.SerialPortEvent;
 public class RoomCommChannel extends SerialCommChannel {
 	
 	private final static String LIGHT = "l";
-	private final static String ROLLER_BLINDS = "d";
+	private final static String ROLLER_BLINDS = "r";
 	private final static String REGEX = "&";
 	
 	private Controller controller;
@@ -26,14 +26,7 @@ public class RoomCommChannel extends SerialCommChannel {
 		sendMsg(ROLLER_BLINDS + String.valueOf(degree));
 	}
 	
-	public int getLight() {
-		return light;
-	}
-
-	public int getRollerBlinds() {
-		return rollerBlinds;
-	}
-	
+	@Override
 	public void serialEvent(SerialPortEvent event) {
 		super.serialEvent(event);
 		String state = null;

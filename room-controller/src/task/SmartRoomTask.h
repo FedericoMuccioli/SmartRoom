@@ -1,14 +1,14 @@
-#ifndef __SMARTLIGHTINGTASK__
-#define __SMARTLIGHTINGTASK__
+#ifndef __SMARTROOMTASK__
+#define __SMARTROOMTASK__
 
 #include "kernel/Task.h"
 #include "devices/Led.h"
 #include "devices/ServoMotorImpl.h"
 #include "kernel/MsgService.h"
 
-#define SMART_LIGHTING_PERIOD 100
+#define SMART_ROOM_PERIOD 1000
 
-class SmartLightingTask: public Task {
+class SmartRoomTask: public Task {
 
 private:
   Light* led;
@@ -18,7 +18,7 @@ private:
   void notifyServer();
 
 public:
-  SmartLightingTask(MsgServiceBT* msgBT);  
+  SmartRoomTask(MsgServiceBT* msgBT);  
   void init(int period);
   void tick();
 };

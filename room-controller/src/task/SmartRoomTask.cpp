@@ -1,21 +1,21 @@
 #include <Arduino.h>
-#include "SmartLightingTask.h"
+#include "SmartRoomTask.h"
 #include "config.h"
 
-SmartLightingTask::SmartLightingTask(MsgServiceBT* msgBT){
+SmartRoomTask::SmartRoomTask(MsgServiceBT* msgBT){
   led = new Led(LED_PIN);
   motor = new ServoMotorImpl(MOTOR_PIN);
   this->msgBT = msgBT;
 }
 
-void SmartLightingTask::init(int period){
+void SmartRoomTask::init(int period){
   Task::init(period);
   led->switchOff();
   motor->on();
   motor->setPosition(0);
 }
 
-void SmartLightingTask::tick(){
+void SmartRoomTask::tick(){
   if(MsgSerial.isMsgAvailable()){
     updateRoom(MsgSerial.receiveMsg());
   } else if(msgBT->isMsgAvailable()){
@@ -23,7 +23,7 @@ void SmartLightingTask::tick(){
   }
 }
 
-void SmartLightingTask::updateRoom(Msg *msg){
+void SmartRoomTask::updateRoom(Msg *msg){
   String string = msg->getContent();
   delete msg;
   char code = string.charAt(0);
@@ -42,15 +42,15 @@ void SmartLightingTask::updateRoom(Msg *msg){
           break;
         }
       break;
-    case 'd':
+    case 'r':
       motor->setPosition(value);
       break;
   }
   notifyServer();
 }
 
-void SmartLightingTask::notifyServer(){
+void SmartRoomTask::notifyServer(){
   String lightStateMsg =  String('l' + String(led->isOn() ? '1' : '0'));
-  String rollerBlindsStateMsg = String('d' + String(motor->getPosition()));
+  String rollerBlindsStateMsg = String('r' + String(motor->getPosition()));
   MsgSerial.sendMsg(lightStateMsg + '&' + rollerBlindsStateMsg);
 }

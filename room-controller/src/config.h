@@ -2,7 +2,7 @@
 #define __CONFIG__
 
 #define BOUND 9600
-#define SCHEDULER_PERIOD 100
+#define SCHEDULER_PERIOD 1000
 
 #define RX_PIN 2
 #define TX_PIN 3

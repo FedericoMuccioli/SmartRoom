@@ -2,11 +2,11 @@
 #include "config.h"
 #include "kernel/MsgService.h"
 #include "kernel/Scheduler.h"
-#include "task/SmartLightingTask.h"
+#include "task/SmartRoomTask.h"
 
 Scheduler sched;
 MsgServiceBT* msgBT;
-Task* smartLightingTask;
+Task* smartRoomTask;
 
 void setup() 
 {
@@ -14,9 +14,9 @@ void setup()
   msgBT = new MsgServiceBT(RX_PIN, TX_PIN);
   msgBT->init(BOUND);
   MsgSerial.init(BOUND);
-  smartLightingTask = new SmartLightingTask(msgBT);
-  smartLightingTask->init(SMART_LIGHTING_PERIOD);
-  sched.addTask(smartLightingTask);
+  smartRoomTask = new SmartRoomTask(msgBT);
+  smartRoomTask->init(SMART_ROOM_PERIOD);
+  sched.addTask(smartRoomTask);
 }
 
 void loop() 
