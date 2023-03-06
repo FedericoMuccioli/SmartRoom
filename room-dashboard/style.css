@@ -1,0 +1,127 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+main{
+    width:100%;
+    height: 100vh;
+}
+
+.settings{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 60vh;
+}
+
+.settings>*{
+    width: 75%;
+}
+
+#stanza>fieldset, #richiedidati>fieldset{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #000000;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+#stanza>fieldset>legend, #richiedidati>fieldset>legend{
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#stanza>fieldset>div>label, #richiedidati>fieldset>div>label{
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+#stanza>fieldset>div, #richiedidati>fieldset>div{
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+#richiedidati>fieldset>input, #stanza>fieldset>input{
+    width: 100%;
+    height: 2rem;
+    border: 1px solid #d8d8d8;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+#richiedidati>fieldset>input[type="submit"]:hover, #stanza>fieldset>input[type="submit"]:hover{
+    background-color:rgb(221, 221, 221)
+}
+
+#richiedidati>fieldset>input[type="submit"]{
+    margin-top: 1rem;
+}
+
+#richiedidati{
+    margin-top: 2rem;
+}
+
+#tabella{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+}
+
+#tabella>h2{
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+table{
+    border: 1px solid #000;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+table tr th{
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+table tr td, table tr th{
+    padding: 0.5rem;
+}
+
+table thead tr th{
+    width: 33%;
+}
+
+table tr:nth-child(odd) td{
+    border-bottom: 1px solid rgb(209, 209, 209);
+    border-top: 1px solid rgb(209, 209, 209);;
+}
+
+main .settings h1{
+    font-size: 2rem;
+    color: #000;
+    margin: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#errore{
+    padding-top: 0.5rem;
+    font-size: 1rem;
+    color: red;
+}
