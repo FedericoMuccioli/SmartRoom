@@ -11,8 +11,6 @@ public class RoomService {
 	 * baud rate of the communication
 	 */
 	private static final int BAUD = 9600;
-	//private static final String PORT = "/dev/tty.usbmodem11401";
-	//private static final String PORT = "/dev/cu.usbmodem11401";
 	
 	/**
 	 * Launch program.
