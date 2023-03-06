@@ -1,17 +1,17 @@
 package controller;
 
 import Json.JsonManager;
-import communication.RoomControllerComm;
+import communication.RoomCommChannel;
 import logic.logic;
 
 public class Controller {
 
-	private final RoomControllerComm roomContrComm;
+	private final RoomCommChannel roomContrComm;
 	private final logic logic;
 	private final JsonManager jm;
 
 	public Controller(final String port, final int rate, final logic logic, final JsonManager jm) throws Exception {
-		this.roomContrComm = new RoomControllerComm(port, rate, this);
+		this.roomContrComm = new RoomCommChannel(port, rate, this);
 		this.logic = logic;
 		this.jm = jm;
 	}

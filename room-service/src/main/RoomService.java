@@ -1,9 +1,6 @@
 package main;
 import Json.JsonManager;
-import communication.CommChannel;
 import communication.MQTTAgent;
-import communication.RoomControllerComm;
-import communication.SerialCommChannel;
 import controller.Controller;
 import io.vertx.core.Vertx;
 import logic.logic;
@@ -25,11 +22,6 @@ public class RoomService {
 	 */
 	public static void main(String[] args) throws Exception {
 		final String port = args[0];
-
-//		CommChannel comm = new SerialCommChannel(port, BAUD);
-//		System.out.println("Waiting Arduino for rebooting...");
-//		Thread.sleep(5000);
-//		System.out.println("Ready.");
 
 		JsonManager jm = new JsonManager();
 		logic logic = new logic();

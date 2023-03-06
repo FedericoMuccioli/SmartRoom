@@ -3,7 +3,7 @@ package communication;
 import controller.Controller;
 import jssc.SerialPortEvent;
 
-public class RoomControllerComm extends SerialCommChannel {
+public class RoomCommChannel extends SerialCommChannel {
 	
 	private final static String LIGHT = "l";
 	private final static String ROLLER_BLINDS = "d";
@@ -13,7 +13,7 @@ public class RoomControllerComm extends SerialCommChannel {
 	private int light;
 	private int rollerBlinds;
 	
-	public RoomControllerComm(final String port, final int rate, final Controller controller) throws Exception {
+	public RoomCommChannel(final String port, final int rate, final Controller controller) throws Exception {
 		super(port, rate);
 		this.controller = controller;
 	}
