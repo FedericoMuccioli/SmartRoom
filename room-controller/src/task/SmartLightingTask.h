@@ -14,7 +14,7 @@ private:
   Light* led;
   ServoMotor* motor;
   MsgServiceBT* msgBT;
-  void doCommand(Msg *msg);
+  void updateRoom(Msg *msg);
   void notifyServer();
 
 public:
