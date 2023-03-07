@@ -15,12 +15,14 @@ window.onload = () => {
     let cambiastatoStanza = document.getElementById('stanza');
     cambiastatoStanza.addEventListener('submit', (e) => {
         e.preventDefault();
-        let timeValue = new Date().getHours() + ":" + new Date().getMinutes();
+        let minutes = new Date().getMinutes();
+        let minutesString = minutes.toString().padStart(2, '0');
+        let timeValue = new Date().getHours() + ":" + minutesString;
         let lightsValue = document.querySelector('#lights');
         lightsValue = lightsValue.checked ? "ON" : "OFF";
         let positionValue = document.getElementById('slider').value;
         const data = { time: timeValue, lights: lightsValue , position: positionValue};
-        fetch('address', {
+        fetch('http://localhost:8080/IoT', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -45,12 +47,14 @@ window.onload = () => {
 function getData(day){
     day = day.split(/\//g);
     correctdate = day[1] + '-' + day[0] + '-' + day[2];
+    const [giorno, mese, anno] = correctdate.split('-');
+    const dataFormattata = `${giorno.padStart(2, '0')}-${mese.padStart(2, '0')}-${anno}`;
     const tabella = document.querySelector("table");
     const giornodati = document.getElementById("giornodati");
     const tbody = tabella.getElementsByTagName("tbody")[0];
     const errore = document.getElementById('errore');
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/provajson/'+correctdate+'.json');
+    xhr.open('GET', 'http://localhost:8080/IoT?file='+dataFormattata+'.json');
     xhr.onload = () => {
     tbody.innerHTML = "";
     if (xhr.status === 200) {
@@ -64,7 +68,7 @@ function getData(day){
             const cellaLuci = riga.insertCell();
             const cellaPersiane = riga.insertCell();
             cellaOrario.innerText = elemento.time;
-            cellaLuci.innerText = elemento.lights == "0" ? "Accese" : "Spente";
+            cellaLuci.innerText = elemento.lights == "1" ? "Accese" : "Spente";
             cellaPersiane.innerText = elemento.position + "%";
             errore.innerText = "";
         });
