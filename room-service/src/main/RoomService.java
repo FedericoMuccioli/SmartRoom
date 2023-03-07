@@ -1,4 +1,6 @@
 package main;
+
+import communication.HTTPServer;
 import communication.MQTTAgent;
 import controller.Controller;
 import io.vertx.core.Vertx;
@@ -20,13 +22,14 @@ public class RoomService {
 	 */
 	public static void main(String[] args) throws Exception {
 		final String port = args[0];
-
 		JsonManager jm = new JsonManager();
 		Logic logic = new Logic();
 		Vertx vertx = Vertx.vertx();
 		Controller controller = new Controller(port, BAUD, logic, jm);
 		MQTTAgent agent = new MQTTAgent(controller);
 		vertx.deployVerticle(agent);
+		new HTTPServer(controller);
+		System.out.println("Server started");
 	}
 
 }
