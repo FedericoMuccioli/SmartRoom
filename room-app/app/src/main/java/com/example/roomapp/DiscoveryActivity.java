@@ -28,6 +28,7 @@ public class DiscoveryActivity extends AppCompatActivity {
     private static final String BLUETOOTH_ENABLE_MSG = "Enable bluetooth to use app!";
     private static final String BLUETOOTH_PERMISSION_MSG = "Allow permission to use app!";
     private static final String UNKNOWN_RESULT_MSG = "Unknown result";
+    private static final String ALREADY_DISCOVERY_MSG = "Discovery already enabled";
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_ENABLE_BT_1 = 2;
     private static final int REQUEST_ENABLE_BT_2 = 3;
@@ -74,12 +75,18 @@ public class DiscoveryActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        bluetoothAdapter.cancelDiscovery();
+        if (bluetoothAdapter.isDiscovering()){
+            bluetoothAdapter.cancelDiscovery();
+        }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (bluetoothAdapter.isDiscovering()){
+            bluetoothAdapter.cancelDiscovery();
+        }
         unregisterReceiver(receiver);
     }
 
@@ -152,6 +159,8 @@ public class DiscoveryActivity extends AppCompatActivity {
             unknownListName.clear();
             unknownListAdapter.notifyDataSetChanged();
             bluetoothAdapter.startDiscovery();
+        } else {
+            Toast.makeText(this, ALREADY_DISCOVERY_MSG, Toast.LENGTH_SHORT).show();
         }
     }
 

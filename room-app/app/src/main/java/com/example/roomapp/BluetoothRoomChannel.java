@@ -59,7 +59,7 @@ public class BluetoothRoomChannel extends Thread {
     public void setRollerBlinds(final int percentage) {
         new Thread(() -> {
             try {
-                String message = "d" + String.valueOf(percentage) + "\n";
+                String message = "r" + String.valueOf(percentage) + "\n";
                 outputStream.write(message.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error setting the roller blinds", e);
