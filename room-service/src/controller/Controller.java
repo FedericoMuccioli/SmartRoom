@@ -35,12 +35,10 @@ public class Controller {
 
 	public void updateLights(boolean lights) {
 		roomCommChannel.setLight(lights);
-		System.out.println("Lights: " + lights);
 	}
 
 	public void updateRollerBlinds(int rollerBlinds) {
 		roomCommChannel.setRollerBlinds(rollerBlinds);
-		System.out.println("Roller blinds: " + rollerBlinds);
 	}
 	
 	public void notifyChangeRoom(final int light, final int rollerBlinds) {

@@ -8,7 +8,6 @@ public class RoomCommChannel extends SerialCommChannel {
 	private final static String LIGHT = "l";
 	private final static String ROLLER_BLINDS = "r";
 	private final static String REGEX = "&";
-	private final static String END_LINE = "\n";
 	
 	private Controller controller;
 	private int light;
@@ -20,11 +19,11 @@ public class RoomCommChannel extends SerialCommChannel {
 	}
 	
 	public void setLight(final boolean light) {
-		sendMsg(LIGHT + (light == true ? "1" : "0") + END_LINE);
+		sendMsg(LIGHT + (light == true ? "1" : "0"));
 	}
 	
 	public void setRollerBlinds(final int percentage) {
-		sendMsg(ROLLER_BLINDS + String.valueOf(percentage) + END_LINE);
+		sendMsg(ROLLER_BLINDS + String.valueOf(percentage));
 	}
 	
 	@Override
