@@ -55,7 +55,7 @@ public:
   void init(int bound);  
   bool isMsgAvailable();
   Msg* receiveMsg();
-  bool sendMsg(Msg msg);
+  void sendMsg(Msg msg);
 
 private:
   String content;

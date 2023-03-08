@@ -65,7 +65,7 @@ void MsgServiceBT::init(int bound){
   availableMsg = NULL;
 }
 
-bool MsgServiceBT::sendMsg(Msg msg){
+void MsgServiceBT::sendMsg(Msg msg){
   channel->println(msg.getContent());  
 }
 
