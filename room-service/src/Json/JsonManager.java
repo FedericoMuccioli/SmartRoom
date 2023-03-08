@@ -14,7 +14,9 @@ public class JsonManager {
 
     public void updateJSON(final int light, final int rollerBlinds){
         String Date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        String Time = String.format("%02d", LocalTime.now().getHour()) + ":" + String.format("%02d", LocalTime.now().getMinute()) + ":" + String.format("%02d", LocalTime.now().getSecond()) ;
+        String Time = String.format("%02d", LocalTime.now().getHour()) + ":" +
+                      String.format("%02d", LocalTime.now().getMinute()) + ":" +
+                      String.format("%02d", LocalTime.now().getSecond());
         if(checkFileExisting(Date)){
             addRowToJSON(Date, Time, light, rollerBlinds);
         }else{
