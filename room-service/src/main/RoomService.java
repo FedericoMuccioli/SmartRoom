@@ -28,8 +28,10 @@ public class RoomService {
 		Controller controller = new Controller(port, BAUD, logic, jm);
 		MQTTAgent agent = new MQTTAgent(controller);
 		vertx.deployVerticle(agent);
+		System.out.println("MQTT Service started");
 		new HTTPServer(controller);
-		System.out.println("Server started");
+		System.out.println("HTTP Server started");
+		System.out.println("Room Service started");
 	}
 
 }
