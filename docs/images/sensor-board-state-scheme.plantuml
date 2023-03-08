@@ -1,0 +1,9 @@
+@startuml rooom-sensor-board
+
+[*] --> UpdateRoom
+UpdateRoom : movement detected / led on
+UpdateRoom : movement detected / send MQTT message
+UpdateRoom : movement undetected / led off
+UpdateRoom : movement undetected / send MQTT message
+
+@enduml
