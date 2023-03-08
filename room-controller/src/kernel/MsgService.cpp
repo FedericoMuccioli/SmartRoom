@@ -1,32 +1,54 @@
 #include <Arduino.h>
 #include "MsgService.h"
 
-String content;
-
 MsgServiceSerial MsgSerial;
 
+void MsgFifoList::enqueue(Msg* msg) {
+  if ((tail + 1) % MAX_SIZE == head) {
+    Serial.println("The list is full");
+    return;
+  }
+
+  list[tail] = msg;
+  tail = (tail + 1) % MAX_SIZE;
+}
+
+Msg* MsgFifoList::dequeue() {
+  Msg* msg = list[head];
+  head = (head + 1) % MAX_SIZE;
+  return msg;
+}
+
+bool MsgFifoList::isEmpty() {
+  return head == tail;
+}
+
+void MsgFifoList::print_list() {
+  Serial.print("List: ");
+  int i = head;
+  while (i != tail) {
+    Serial.print(list[i]->getContent());
+    Serial.print(" ");
+    i = (i + 1) % MAX_SIZE;
+  }
+  Serial.println();
+}
+
 bool MsgServiceSerial::isMsgAvailable(){
-  return msgAvailable;
+  return !list.isEmpty();
 }
 
 Msg* MsgServiceSerial::receiveMsg(){
-  if (msgAvailable){
-    Msg* msg = currentMsg;
-    msgAvailable = false;
-    currentMsg = NULL;
-    content = "";
-    return msg;  
-  } else {
-    return NULL; 
+  if (list.isEmpty()){
+    return NULL;
   }
+  return list.dequeue();
 }
 
 void MsgServiceSerial::init(int bound){
   Serial.begin(bound);
   content.reserve(256);
   content = "";
-  currentMsg = NULL;
-  msgAvailable = false;  
 }
 
 void MsgServiceSerial::sendMsg(const String& msg){
@@ -76,10 +98,10 @@ void serialEvent() {
   while (Serial.available()) {
     char ch = (char) Serial.read();
     if (ch == '\n'){
-      MsgSerial.currentMsg = new Msg(content);
-      MsgSerial.msgAvailable = true;      
+      MsgSerial.list.enqueue(new Msg(MsgSerial.content));
+      MsgSerial.content = "";     
     } else {
-      content += ch;      
+      MsgSerial.content += ch;      
     }
   }
   

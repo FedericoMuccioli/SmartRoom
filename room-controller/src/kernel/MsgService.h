@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include "SoftwareSerial.h"
 
+#define MAX_SIZE 10
+
 class Msg {
   String content;
 
@@ -17,13 +19,27 @@ public:
   }
 };
 
+class MsgFifoList {
+private:
+  Msg* list[MAX_SIZE];
+  int head = 0;
+  int tail = 0;
+
+public:
+  void enqueue(Msg* msg);
+  Msg* dequeue();
+  bool isEmpty();
+  void print_list();
+  
+};
+
 class MsgServiceSerial {
     
 public: 
   
-  Msg* currentMsg;
-  bool msgAvailable;
-
+  MsgFifoList list;
+  String content;
+  
   void init(int bound);  
 
   bool isMsgAvailable();
