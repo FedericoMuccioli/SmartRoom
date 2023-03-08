@@ -35,22 +35,22 @@ public class DiscoveryActivity extends AppCompatActivity {
     private static final int REQUEST_SCAN_BT = 4;
 
     private ListView pairedListView;
-    private ListView unknownListView;
+    private ListView availableListView;
     private Button discoveryButton;
     private BluetoothAdapter bluetoothAdapter;
     private List<BluetoothDevice> pairedList;
-    private List<BluetoothDevice> unknownList;
+    private List<BluetoothDevice> availableList;
     private List<String> pairedListName;
-    private List<String> unknownListName;
+    private List<String> availableListName;
     private ArrayAdapter<String> pairedListAdapter;
-    private ArrayAdapter<String> unknownListAdapter;
+    private ArrayAdapter<String> availableListAdapter;
     private boolean tryScan = false;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                foundUnknownDevice(device);
+                foundAvailableDevice(device);
             }
         }
     };
@@ -92,7 +92,7 @@ public class DiscoveryActivity extends AppCompatActivity {
 
     private void createUI() {
         pairedListView = findViewById(R.id.pairedList);
-        unknownListView = findViewById(R.id.unknownList);
+        availableListView = findViewById(R.id.availableList);
         discoveryButton = findViewById(R.id.discoveryButton);
         discoveryButton.setOnClickListener((v) -> scanBluetooth());
 
@@ -103,12 +103,12 @@ public class DiscoveryActivity extends AppCompatActivity {
         pairedListView.setOnItemClickListener((adapterView, view, i, l) -> {
             clickedDevice(pairedList.get(i));
         });
-        unknownList = new ArrayList<>();
-        unknownListName = new ArrayList<>();
-        unknownListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, unknownListName);
-        unknownListView.setAdapter(unknownListAdapter);
-        unknownListView.setOnItemClickListener((adapterView, view, i, l) -> {
-            clickedDevice(unknownList.get(i));
+        availableList = new ArrayList<>();
+        availableListName = new ArrayList<>();
+        availableListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, availableListName);
+        availableListView.setAdapter(availableListAdapter);
+        availableListView.setOnItemClickListener((adapterView, view, i, l) -> {
+            clickedDevice(availableList.get(i));
         });
     }
     private void clickedDevice(final BluetoothDevice device) {
@@ -137,7 +137,7 @@ public class DiscoveryActivity extends AppCompatActivity {
             return;
         }
         scanPairedDevices();
-        scanUnknownDevices();
+        scanAvailableDevices();
         tryScan = false;
     }
 
@@ -153,11 +153,11 @@ public class DiscoveryActivity extends AppCompatActivity {
     }
 
     @SuppressLint("MissingPermission")
-    private void scanUnknownDevices(){
+    private void scanAvailableDevices(){
         if (!bluetoothAdapter.isDiscovering()) {
-            unknownList.clear();
-            unknownListName.clear();
-            unknownListAdapter.notifyDataSetChanged();
+            availableList.clear();
+            availableListName.clear();
+            availableListAdapter.notifyDataSetChanged();
             bluetoothAdapter.startDiscovery();
         } else {
             Toast.makeText(this, ALREADY_DISCOVERY_MSG, Toast.LENGTH_SHORT).show();
@@ -165,10 +165,10 @@ public class DiscoveryActivity extends AppCompatActivity {
     }
 
     @SuppressLint("MissingPermission")
-    private void foundUnknownDevice(BluetoothDevice device){
-        unknownList.add(device);
-        unknownListName.add(device.getName());
-        unknownListAdapter.notifyDataSetChanged();
+    private void foundAvailableDevice(BluetoothDevice device){
+        availableList.add(device);
+        availableListName.add(device.getName());
+        availableListAdapter.notifyDataSetChanged();
     }
 
     private boolean enableBluetooth() {
