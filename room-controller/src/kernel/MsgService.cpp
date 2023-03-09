@@ -5,10 +5,8 @@ MsgServiceSerial MsgSerial;
 
 void MsgFifoList::enqueue(Msg* msg) {
   if ((tail + 1) % MAX_SIZE == head) {
-    Serial.println("The list is full");
-    return;
+    head = (head + 1) % MAX_SIZE;
   }
-
   list[tail] = msg;
   tail = (tail + 1) % MAX_SIZE;
 }

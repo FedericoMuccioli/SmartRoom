@@ -16,9 +16,10 @@ void SmartRoomTask::init(int period){
 }
 
 void SmartRoomTask::tick(){
-  if(MsgSerial.isMsgAvailable()){
+  while (MsgSerial.isMsgAvailable()){
     updateRoom(MsgSerial.receiveMsg());
-  } else if(msgBT->isMsgAvailable()){
+  }
+  while (msgBT->isMsgAvailable()){
     updateRoom(msgBT->receiveMsg());
   }
 }
