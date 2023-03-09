@@ -15,13 +15,10 @@ window.onload = () => {
     let cambiastatoStanza = document.getElementById('stanza');
     cambiastatoStanza.addEventListener('submit', (e) => {
         e.preventDefault();
-        let minutes = new Date().getMinutes();
-        let minutesString = minutes.toString().padStart(2, '0');
-        let timeValue = new Date().getHours() + ":" + minutesString;
         let lightsValue = document.querySelector('#lights');
         lightsValue = lightsValue.checked ? "ON" : "OFF";
         let positionValue = document.getElementById('slider').value;
-        const data = { time: timeValue, lights: lightsValue , position: positionValue};
+        const data = {lights: lightsValue , position: positionValue};
         fetch('http://localhost:8080/IoT', {
         method: 'POST',
         headers: {
