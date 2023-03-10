@@ -1,6 +1,8 @@
 @startuml rooom-sensor-board
 
 [*] --> UpdateRoom
+UpdateRoom : entry / Connect to WIFI
+UpdateRoom : entry / Connect to MQTT broker
 UpdateRoom : movement detected / led on
 UpdateRoom : movement detected / send MQTT message
 UpdateRoom : movement undetected / led off
